@@ -2,7 +2,7 @@
 
 > **True Forward-Only Autograd-Free Wave-Field LLM Swappable Plug-in Architecture**  
 > 거대 트랜스포머 LLM의 연산 족쇄(Attention, Backprop, KV Cache)를 제거하고, 1차원 수리 물리 연속체 커널로 핀포인트 부분 치환·개조하기 위한 0ns 무복사 하이브리드 플러그인 아키텍처 규격입니다.
-
+> 아직 부족함이 많은 청사진 버전이며 AS IS로 제공됩니다.
 ---
 
 ## 🏛️ 아키텍처 개요 (Philosophy)
@@ -48,6 +48,38 @@
 *   **질량 중심 적분 역산 디코더**: 거대 사전 Softmax 확률 계산 레이어를 전면 걷어내고, 변형 가공된 1D 출력 파동 필드의 절대 에너지 질량 중심($Center\ of\ Mass$) 물리 공간을 적분 추적하여 유클리드 최소 매칭으로 어휘를 즉각 역산해 냅니다.
 *   **웨이브릿 분할 역산 스트림**: 격자 필드를 입력 단어의 개수(`segment_window = num_tokens`) 해상도로 윈도우 슬라이싱하여, 시계열적으로 이어진 문장 전체를 단 1나노초의 KV 캐시 축적도 없이 정적 컨텍스트 복잡도 상태로 완벽 복원합니다.
 *   **부하 0.0% 패시브 항상성 관제**: 평상시 정상 데이터 경로에서는 단 하나의 조건문만 체크하고 즉시 탈출하는 Strict Zero(0.0%) 관제 부하를 유지하다가, 결함 마커(`-99.0f`) 유입 시에만 비동기 원자적 뮤텍스 락(`asyncio.Lock`)을 켜고 Cold Standby 노드로 0ns 가상 주소선 우회 핫플러깅을 집행합니다.
+
+
+---
+
+## ⚙️ 하이브리드 레이어 스왑 실전 예시 (Drop-in Swapping Example)
+
+기존 PyTorch 기반 트랜스포머 아키텍처 전체를 부수고 재학습할 필요가 없습니다. 자원을 기하급수적으로 갉아먹는 기존 모델의 `nn.MultiheadAttention` 레이어 블록만 지정하여 본 하이브리드 결착 모듈로 '단 한 줄' 스왑하면 실리콘 단 하이재킹 관로가 즉시 개통됩니다.
+
+```python
+import torch.nn as nn
+# 🔗 신설된 하이브리드 결착 플러그인 모듈을 수입합니다.
+from transformer_interlock import PyTorchToJaxWaveFieldInterlockModule
+
+class CustomTransformerBlock(nn.Module):
+    def __init__(self, config):
+        super().__init__()
+        # ❌ 기존의 VRAM 폭발 및 KV 캐시 병목 레이어 폐기
+        # self.attention = nn.MultiheadAttention(config.hidden_dim, config.num_heads)
+        
+        # ✅ 0ns 제로카피 파동 유체 제어 인터록 모듈로 '한 줄 스왑(Swap)' 집행!
+        self.attention = PyTorchToJaxWaveFieldInterlockModule(num_grid_points=1024)
+        self.mlp = nn.Sequential(
+            nn.Linear(config.hidden_dim, config.hidden_dim * 4),
+            nn.ReLU(),
+            nn.Linear(config.hidden_dim * 4, config.hidden_dim)
+        )
+
+    def forward(self, x):
+        # 상하부 데이터로더 및 인프라 파이프라인 90% 코드는 단 한 줄도 손대지 않고 그대로 유지됩니다.
+        attn_out = self.attention(x) 
+        return self.mlp(attn_out) + x
+```
 
 
 ---
