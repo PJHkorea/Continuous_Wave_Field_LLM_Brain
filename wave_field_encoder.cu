@@ -129,11 +129,11 @@ void launch_wave_ingress_kernel(
     int threads_per_block = 256;
     int blocks_per_grid = (num_grid_points + threads_per_block - 1) / threads_per_block;
     
-    # // [보정] 2단계 커널 내부의 32바이트 하드웨어 대역폭(8개 float 뱅크) 정렬식과 1:1 싱크 매칭
+     // [보정] 2단계 커널 내부의 32바이트 하드웨어 대역폭(8개 float 뱅크) 정렬식과 1:1 싱크 매칭
     int aligned_num_tokens = (num_tokens + 7) & ~7;
     size_t shared_mem_bytes = aligned_num_tokens * sizeof(float) * 2;
 
-    # // 0ns 완전 비동기 사격 실행 - 커널 명령을 가속기 명령어 큐(Stream 0)에 던진 후 즉시 호스트 리턴
+     // 0ns 완전 비동기 사격 실행 - 커널 명령을 가속기 명령어 큐(Stream 0)에 던진 후 즉시 호스트 리턴
     convert_tokens_to_continuous_fluid_wave_dynamic<<<blocks_per_grid, threads_per_block, shared_mem_bytes>>>(
         reinterpret_cast<const float*>(token_pos_ptr),
         reinterpret_cast<const float*>(token_w_ptr),
@@ -143,8 +143,8 @@ void launch_wave_ingress_kernel(
         reinterpret_cast<IngressPinnCell*>(mesh_cells_ptr)
     );
     
-    # // [🛡️ PIPELINE SYNC UNLEASHED] CPU 블로킹 유발 지점을 영구 청산하여 JAX 비동기 연산과 결착 유도
-    # // cudaDeviceSynchronize(); -> 삭제 완료
+     // [🛡️ PIPELINE SYNC UNLEASHED] CPU 블로킹 유발 지점을 영구 청산하여 JAX 비동기 연산과 결착 유도
+     // cudaDeviceSynchronize(); -> 삭제 완료
 }
 
 // pybind11 외곽 모듈 최종 익스포트 확정
