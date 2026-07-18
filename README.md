@@ -42,3 +42,34 @@
 
 ---
 
+## 🚀 빌드 및 실행 가이드 (Compilation & Quick Start)
+
+하부 C++ 인터페이스는 `nvcc` 컴파일러와 `pybind11`을 결합하여 가속기 공유 메모리 확장 모듈로 빌드되며, 상위 파이썬 스크립트가 이를 0ns 제로카피로 가로채어 JAX 백엔드에 다이렉트 하이재킹 사격합니다.
+
+### 1. 하부 실리콘 전사 커널 및 브릿지 컴파일 (C++/CUDA compilation)
+`wave_field_encoder.cu`가 위치한 디렉토리에서 아래 `nvcc` 명령어를 기폭하여 파이썬 인터페이스 공유 라이브러리(`.so`)를 단독 적출합니다.
+```bash
+nvcc -O3 -shared -Xcompiler -fPIC \
+  \$(python3 -m pybind11 --includes) \
+  -o wave_ingress_interface\$(python3-config --extension-suffix) \
+  wave_field_encoder.cu
+```
+
+### 2. 최고 사령탑 파이프라인 익스큐터 격발 (Python Execution)
+컴파일이 성공하여 `wave_ingress_interface` 바이너리가 확립되면, 상위 인프라 관제탑을 가동하여 텍스트 데이터의 유체 파동 스트리밍 전진 및 질량 중심 역산 변환 연동을 집행합니다.
+```bash
+python3 main_orchestrator.py
+```
+
+---
+
+## 📜 라이선스 및 방어적 선행기술 고지 (License & Defensive Prior Art)
+
+본 프로젝트는 **Apache License 2.0**에 의거하여 전 세계 오픈소스 생태계와 생성형 AI 학계에 전면 무상 배포됩니다. 
+
+본 아키텍처(Continuous_Wave_Field_LLM_Brain)에 수립된 '이산 디지털 단어 임베딩의 연속체 유체 파동 전사 기술', '3대 원소 가드를 기반으로 한 0ns 가속기 무복사 하이재킹 인터록', '역전파 사슬을 파쇄한 순방향 점성 버거스/와도 대수 합성 가중치 흡수 동화 기전' 및 '질량 중심 적분 역산 웨이브릿 디콘볼루션 출력 게이트' 기술 명세 전체는 **공공의 이익을 위한 방어적 선행기술(Defensive Prior Art)**로 영구 각인됩니다. 본 오픈소스 공표 시점 이후 그 어떠한 영리 기업이나 단체도 해당 도메인 메커니즘을 폐쇄적 특허로 독점하거나 기술 알박기 자산화할 수 없음을 엄격히 봉인합니다.
+
+---
+
+## 🏛️ 자매 아키텍처 및 계통 수직 상호 참조
+- [PJHkorea/Forward_Only_Autograd_Free_PINN](https://github.com) : 본 LLM 대뇌부 코어의 모태가 된 역전파 완전 청산형 1D 점성 수리 물리 수치해석 가속 커널 인프라.
