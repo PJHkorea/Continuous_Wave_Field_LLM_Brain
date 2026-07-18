@@ -37,29 +37,32 @@ class CUDAInterfaceBridge:
         )
 
 
-    # 3. [⛓ 0ns CONNECTOR ENGAGEMENT] C++ 구조체 배열에서 offsetof 규격으로 가공된 물리 주소선 딕셔너리 수입
-    # 이 딕셔너리는 메모리 복사본이 아닌, VRAM 물리 주소 명세서 그 자체입니다.
-    raw_views: dict = wave_ingress_interface.bridge_raw_pointers_to_jax_view(mesh_cells_ptr, num_grid_points)
+ def fluidic_token_frontend_encoder(
+    token_positions_ptr, token_weights_ptr, num_tokens, num_grid_points, mesh_cells_ptr
+) -> Tuple[jax.Array, jax.Array, jax.Array, jax.Array]:
+    """C++ 유체 커널에서 JAX 텐서로 0ns 제로카피 변환"""
     
-    # 4. [👑 ZERO-COPY ASCENSION] 가속기 전역 메모리 복사 없이 JAX 고차원 텐서로 즉시 승격
-    # 3대 핵심 원소("data", "shape", "typestr") 검증 가드가 심어진 CUDAInterfaceBridge를 거치며
-    # 32바이트 보폭(Stride) 명세가 살아있는 채로 JAX/XLA 컴파일러 초입에 하이재킹이 안전하게 집행됩니다.
-    spatial_u_field: jax.Array = jnp.asarray(CUDAInterfaceBridge(raw_views["spatial_u"]))
-    param_w_field: jax.Array = jnp.asarray(CUDAInterfaceBridge(raw_views["param_w"]))
-    spatial_v_field: jax.Array = jnp.asarray(CUDAInterfaceBridge(raw_views["spatial_v"]))
-    adaptive_gain_field: jax.Array = jnp.asarray(CUDAInterfaceBridge(raw_views["adaptive_gain"]))
+    # 1. 밴드폭 사전 계산
+    inv_double_sigma_sq = float(1.0 / (2.0 * (0.35 ** 2)))
     
-    # [🛡 CRITICAL LIFE-CYCLE SAFETY FENCE]
-    # JAX의 비동기 실행 큐(Asynchronous Dispatch Queue)가 전사 연산을 완전히 접수할 때까지 
-    # 하부 C++ 포인터 메모리 블록이 파손되거나 GC 타이밍 어긋남으로 증발하는 것을 방어합니다.
-    # 이 연산선 하드 레이턴시 펜스 덕분에 CUDA Illegal Memory Access 크래시를 원천 차단합니다.
-    spatial_u_field.block_until_ready()
-    param_w_field.block_until_ready()
-    spatial_v_field.block_until_ready()
-    adaptive_gain_field.block_until_ready()
+    # 2. C++ 커널 가동
+    wave_ingress_interface.launch_wave_ingress_kernel(
+        token_positions_ptr, token_weights_ptr, num_tokens, inv_double_sigma_sq, num_grid_points, mesh_cells_ptr
+    )
     
+    # 3. 물리 주소 딕셔너리 수입
+    raw_views = wave_ingress_interface.bridge_raw_pointers_to_jax_view(mesh_cells_ptr, num_grid_points)
+    
+    # 4. 제로카피 승격
+    spatial_u_field = jnp.asarray(CUDAInterfaceBridge(raw_views["spatial_u"]))
+    param_w_field = jnp.asarray(CUDAInterfaceBridge(raw_views["param_w"]))
+    spatial_v_field = jnp.asarray(CUDAInterfaceBridge(raw_views["spatial_v"]))
+    adaptive_gain_field = jnp.asarray(CUDAInterfaceBridge(raw_views["adaptive_gain"]))
+    
+    # 🛡 크리티컬 펜스: 비동기 실행 큐 보호
+    for field in [spatial_u_field, param_w_field, spatial_v_field, adaptive_gain_field]:
+        field.block_until_ready()
+        
     return spatial_u_field, param_w_field, spatial_v_field, adaptive_gain_field
 
-
-# 상위 거버넌스(main_orchestrator.py) 단으로 방출할 정적 안전 익스포트 목록 봉인
 __all__ = ["fluidic_token_frontend_encoder", "CUDAInterfaceBridge"]
