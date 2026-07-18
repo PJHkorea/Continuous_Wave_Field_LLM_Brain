@@ -48,7 +48,7 @@ class OutputWaveTokenDecoder:
         
         # 에너지 제로 상태(청정 베이스라인) 진입 시 공백 패딩 토큰 즉시 플러시
         if total_energy < 1e-6:
-            return self.vocab[0]["token"]
+            return self.vocab[0]["token"] # [PAD] 토큰 반환
             
         wave_center_mass_x = np.sum(x_axis * absolute_energy) / total_energy
         
@@ -85,10 +85,11 @@ class OutputWaveTokenDecoder:
             segment_u[start_idx:end_idx] = host_spatial_u[start_idx:end_idx]
             
             token = self.decode_fluid_field_to_token(segment_u)
-            if token != self.vocab[0]["token"]: # PAD 토큰은 릴리즈 스트림에서 압착 제외
+            if token != self.vocab[0]["token"]: # [PAD] 토큰은 릴리즈 스트림에서 압착 제외
                 decoded_sequence.append(token)
                 
         return decoded_sequence
+
 
 class LlmBrainInfrastructureOrchestrator:
     """
@@ -102,7 +103,7 @@ class LlmBrainInfrastructureOrchestrator:
         self.decoder: OutputWaveTokenDecoder = OutputWaveTokenDecoder()
         
         # [🛡 MUTEX RESOURCE PROTECTION COMPARTMENT]
-        # 분산 격자점 뱅크에서 고장 신호가Burst로 인입될 때 경합을 박멸하는 원자적 가드
+        # 분산 격자점 뱅크에서 고장 신호가 Burst로 인입될 때 자원 경합을 박멸하는 원자적 가드
         self.infrastructure_atomic_lock: asyncio.Lock = asyncio.Lock()
         
         # [🔌 COLD STANDBY ADDRESS HOT-SWAPPING SYSTEM]
@@ -117,9 +118,9 @@ class LlmBrainInfrastructureOrchestrator:
         시스템이 정상 평형 상태(0.0f)일 때는 어떠한 관제 연산 오버헤드도 소모하지 않고 즉시 Pass 시킵니다.
         결함(-99.0f) 유입 시에만 깨어나 자율 라우팅 핫스왑을 집행합니다.
         """
-        # [🎯 PASSTHROUGH FAST PATH]
+        # [🎯 PASSTHROUGH FAST PATH] 평상시 관제 부하 정확히 0.0% 달성
         if hardware_marker_signal == 0.0:
-            return  # 평상시 관제 부하 정확히 0.0% 달성
+            return  
 
         # 시스템 자율 정정(Self-Alignment)으로 평형을 복구했다는 정상 시그널 처리
         if hardware_marker_signal == 1.0: # SYSTEM_RECOVERY_KEY
@@ -155,6 +156,7 @@ class LlmBrainInfrastructureOrchestrator:
             self.active_hardware_backup_routes[(failed_node_id, failed_channel_id)] = allocated_backup_node_id
             
             print(f"[🛡 Layer 3-2 SOLVED] 0ns Address Hot-Swap Complete. Rerouted Bus to Backup Node [{allocated_backup_node_id}].")
+
 
     async def run_enterprise_wave_llm_pipeline(self, raw_input_text: str) -> None:
         """
