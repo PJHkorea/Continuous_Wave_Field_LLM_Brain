@@ -204,17 +204,20 @@ class ContinuousWaveFieldLlmBrain:
             "cell_status": host_status
         }
 
-    def enforce_memory_fence_release(self, current_state: Dict[str, jax.Array]) -> None:
-        """[🛡 INSULATED LIFETIME FENCE RELEASE] 가속기 물리 메모리 연결 안전 해제"""
+       def enforce_memory_fence_release(self, current_state: Dict[str, jax.Array]) -> None:
+        """
+        [🛡 INSULATED LIFETIME FENCE RELEASE]
+        파이썬 가비지 컬렉터(GC)의 비동기 자원 회수 시도로 인한 VRAM 물리 주소선 파손을 
+        원천 방어하기 위해, 상태 텐서들의 가속기 물리 메모리 연결을 안전하게 해제합니다.
+        """
         try:
             for key, tensor in current_state.items():
                 if hasattr(tensor, "device_buffer"):
+                    # 가속기 내부 하부 메모리 풀 버퍼 할당 직접 해제 및 동기화 지점 확인
                     tensor.device_buffer.free()
             print("[👑 Layer 2-6] Memory Fence Safety Cleared. Hardware Track Safely Released.")
         except Exception as infrastructure_fault:
-
-            print("[👑 Layer 2-6] Memory Fence Safety Cleared. Hardware Track Safely Released.")
-        except Exception as infrastructure_fault:
+            # [🛡 정밀 보완] 논리 혼선 및 중복 절을 완벽히 격리하여 청정 결함 관제 로깅 수립
             print(f"[🚨 Layer 2-6 CRITICAL FAULT] Safe Release Intercepted: {infrastructure_fault}")
 
     def __del__(self) -> None:
@@ -231,3 +234,4 @@ class ContinuousWaveFieldLlmBrain:
 # [🔒 MODULE SYSTEM GLOBAL IMMUTABILITY SYSTEM ANCHOR]
 # 상위 프레임워크 런타임에서 이 수리 엔진 모듈의 토폴로지가 임의 변경되는 것을 원천 방어
 __all__ = ["ContinuousWaveFieldLlmBrain", "BRAIN_CONFIG", "MEMORY_LAYOUT_REGISTRY"]
+
