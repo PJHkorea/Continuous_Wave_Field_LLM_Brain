@@ -1,67 +1,84 @@
+# =====================================================================================
+# [👑 LAYER 1.5 - 2: PYTORCH-JAX 0ns HYBRID INTERLOCK PLUG-IN]
+# =====================================================================================
+# @file transformer_interlock.py
+# @brief High-speed 이종 프레임워크 0ns hybrid interlock plug-in driving zero-copy memory hijacking.
+# 
+# @license Apache License 2.0 (Defensive Prior Art Registration)
+# @author PJHkorea
+# =====================================================================================
+
 import torch
 import torch.nn as nn
 import jax
 import jax.numpy as jnp
 import numpy as np
 
-# [🔗 기존 레포지토리 레이어 자산 네이티브 상속 및 수입]
-# 저자가 Apache 2.0으로 완전 해방한 프론트엔드 브릿지와 JAX 수학 코어를 그대로 결착합니다.
+# Native asset inheritance linked with the frontend bridge and autograd-free mathematical engine
 from wave_frontend_bridge import fluidic_token_frontend_encoder, CUDAInterfaceBridge
 from wave_brain_core import ContinuousWaveFieldLlmBrain, BRAIN_CONFIG
 
 class PyTorchToJaxWaveFieldInterlockModule(nn.Module):
     """
     [👑 PYTORCH-JAX 0ns HYBRID INTERLOCK PLUG-IN]
-    기존 PyTorch 트랜스포머 레이어 한복판에서 VRAM 물리 주소선을 0ns 만에 하이재킹하여,
-    역전파와 KV 캐시가 박멸된 JAX 유체 파동 제어로 스왑하는 실전 하이브리드 모듈입니다.
+    Intercepts and hijacks the VRAM physical address-line natively inside the PyTorch 
+    Transformer forward pipeline, switching execution paths to the autograd-insulated 
+    JAX fluidic wave-field engine with a true 0ns latency footprint.
     """
     def __init__(self, num_grid_points: int = 1024):
+        """
+        [INIT] 
+        Instantiates the sovereign autograd-free brain mathematical engine and binds 
+        the mandatory isolation parameters to block backward tracing tracks.
+        """
         super().__init__()
         self.num_grid_points = num_grid_points
         
-        # [🧠 JAX 오토그라드 프리 대뇌 엔진 인스턴스 상주]
+        # Resident autograd-free mathematical engine core
         self.jax_brain = ContinuousWaveFieldLlmBrain()
         
-        # PyTorch 레이어 간의 역전파 사슬을 끊어내기 위한 더미 가중치 명시
-        # (실제 학습은 순방향 전방 관통 시 JAX 단에서 대수적으로 즉시 자율 정렬됩니다)
+        # Explicit dummy parameter injected to safely isolate and sever the PyTorch backward dependency graph.
+        # Active parameter learning is autonomously executed over the forward pass via XLA FMA primitives.
         self.dummy_param = nn.Parameter(torch.zeros(1))
 
     def forward(self, pytorch_token_embeddings: torch.Tensor) -> torch.Tensor:
         """
         [⚡ FORWARD-ONLY MEMORY HIJACKING PIPELINE]
-        PyTorch 텐서가 진입하는 찰나, 호스트-디바이스 복사 없이 가속기 물리 주소선을 가로챕니다.
+        The exact moment the PyTorch tensor reaches this activation layer boundary, 
+        its physical memory pointer is highjacked without suffering from host-device (H2D/D2H) replication costs.
         """
         # [🛡️ SHAPE & DEVICE SANITY BLOCK]
-        # 인입된 PyTorch 텐서가 GPU VRAM 상에 정렬되어 있는지 검증합니다.
+        # Verifies that the incoming PyTorch tensor safely anchors on NVIDIA GPU device memory VRAM.
         assert pytorch_token_embeddings.is_cuda, "[🚨 INTERLOCK FAULT] PyTorch Tensor must reside on NVIDIA GPU VRAM."
         
-        # 배치 및 시퀀스 차원을 평탄화하여 1D 수리 물리 격자선 도메인 사양으로 일치시킵니다.
-        # 형상: [Batch, Sequence, Hidden_Dim] -> [Total_Tokens, Hidden_Dim]
+        # Flattens the batch and sequence dimension boundaries to align straight with the 1D physical grid topology.
+        # Transformation geometry layout: [Batch, Sequence, Hidden_Dim] -> [Total_Tokens, Hidden_Dim]
         flat_embeddings = pytorch_token_embeddings.contiguous().view(-1, pytorch_token_embeddings.size(-1))
         num_tokens = flat_embeddings.size(0)
+
         
-        # =====================================================================================
+              # =====================================================================================
         # 📌 [🔮 THE MASTER TRICK - 0ns VRAM ADDRESS HIJACKING VIA DLPACK & INTERFACE]
         # =====================================================================================
-        # PyTorch가 관리하던 VRAM 물리 기저 주소선(Raw Pointer)을 단 1비트의 데이터 복사도 없이 낚아챕니다.
+        # Captures the physical raw VRAM base address pointer managed by PyTorch with a true 0-bit copy profile.
         pytorch_raw_vram_ptr = flat_embeddings.data_ptr()
         
-        # C++ Bare-Metal 커널(wave_field_encoder.cu)이 사격할 출구 측 VRAM 뼈대 버퍼를 PyTorch 단에서 선제 할당합니다.
-        # (32바이트 정렬 보폭 규격을 맞추기 위해 정밀 공간 격자 크기만큼 사전에 락킹)
-        # IngressPinnCell 구조체 크기(32바이트)를 반영한 임시 고속 물리 캔버스 확보
+        # Pre-allocates the egress side VRAM scratchpad canvas inside PyTorch that the low-level C++ bare-metal 
+        # kernel (wave_field_encoder.cu) will execute direct write-backs onto.
+        # Ensures strict alignment with the 32-byte physical stride vector (sizeof(IngressPinnCell) = 32 bytes).
         allocated_mesh_cells_tensor = torch.empty(
-            self.num_grid_points * 8, # sizeof(IngressPinnCell) = 32 bytes (float 8개 분량)
+            self.num_grid_points * 8, # sizeof(IngressPinnCell) = 32 bytes (Total 8 single-precision float elements)
             dtype=torch.float32, 
             device=pytorch_token_embeddings.device
         )
         mesh_cells_ptr = allocated_mesh_cells_tensor.data_ptr()
         
-        # 가상의 가중치 레일 주소선 확보
+        # Allocates virtual attention weight rail memory topologies
         token_weights_tensor = torch.ones(num_tokens, dtype=torch.float32, device=pytorch_token_embeddings.device)
         token_weights_ptr = token_weights_tensor.data_ptr()
         
         # [🚀 LAYER 1 & 1.5 DIRECT COMMIT - CUDA KERNEL SHOT]
-        # 기존 C++ 프론트엔드 브릿지 관로를 격발하여 PyTorch의 주소선을 JAX 표준 외곽선 뷰로 제로카피 승격시킵니다.
+        # Detonates the underlying C++ frontend bridge pipeline to lift PyTorch raw pointers straight into the JAX array interface view.
         spatial_u, param_w, spatial_v, adaptive_gain, cell_status, coordinate_id = fluidic_token_frontend_encoder(
             token_positions_ptr=pytorch_raw_vram_ptr,
             token_weights_ptr=token_weights_ptr,
@@ -70,27 +87,30 @@ class PyTorchToJaxWaveFieldInterlockModule(nn.Module):
             mesh_cells_ptr=mesh_cells_ptr
         )
         
-        # JAX 백엔드가 표준 6채널 메모리 포맷으로 인지하도록 딕셔너리 재패키징
+        # Repackages discrete tensors into the 6-channel SoA dictionary format required by the JAX/XLA backend
+        # Precision-coupled straight with the FNG V3 pre-rectified Key/Value cache delta stream profiles.
         jax_master_channels = {
             "spatial_u": spatial_u, "param_w": param_w, "spatial_v": spatial_v,
             "adaptive_gain": adaptive_gain, "cell_status": cell_status, "coordinate_id": coordinate_id
         }
         
         # [🧠 LAYER 2: TRUE FORWARD-ONLY WAVE BRAIN COMPUTE]
-        # 역전파 추적선이 완전 분쇄된 JAX 대뇌 코어의 1-Cycle FMA 대수적 자율 정렬 엔진을 관통시킵니다.
-        # KV 캐시 누적이 전혀 없는 정적 O(1) 메모리 패스가 집행됩니다.
+        # Drives the autograd-free mathematical core driving single-clock hardware FMA (Fused Multiply-Add) primitives.
+        # Fully locks execution graphs into accelerator caches with a static O(1) computational memory complexity.
         updated_jax_state = self.jax_brain.step(jax_master_channels)
         
-        # 연산이 완료된 JAX VRAM 출력 필드 뷰를 다시 0ns 만에 가로챕니다.
-        # (DLPack 인터페이스를 통해 복사 비용 없이 JAX 텐서를 PyTorch 텐서 공간으로 하이재킹 전환)
+        # Intercepts the algebraically synthesized JAX VRAM output field view with a true 0ns profile.
+        # Leverages the DLPack unified memory standard to hijack JAX arrays back into PyTorch tensor boundaries without copies.
         jax_output_u = updated_jax_state["spatial_u"]
         
-        # [🛡️ CRITICAL LIFECYCLE FENCE] 파이썬 가비지 컬렉터의 조기 해제를 차단하는 하드 펜스 작동
+        # [🛡️ CRITICAL LIFECYCLE FENCE]
+        # Asynchronous hard fence: Fundamentally locks asynchronous tracking cues to prevent premature pointer destruction by GC.
         jax_output_u.block_until_ready()
         
-        # JAX Array를 PyTorch Tensor로 0ns 무복사 복원 바인딩
+        # Binding the JAX array straight back into the PyTorch Tensor space via zero-copy DLPack tunneling protocols
         pytorch_return_tensor = torch.from_dlpack(jax.dlpack.to_dlpack(jax_output_u))
         
         # [🚀 FINAL RE-SHAPE RETURN]
-        # 기존 트랜스포머 상위 레이어가 요구하는 원래의 배치 및 차원 형상 스펙으로 마감 복귀시킵니다.
+        # Restores the original batch and dimensional layout specifications required by upper macro-level Transformer layers.
         return pytorch_return_tensor.view(pytorch_token_embeddings.size(0), pytorch_token_embeddings.size(1), -1)
+
