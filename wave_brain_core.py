@@ -110,15 +110,34 @@ class ContinuousWaveFieldLlmBrain:
         [EN] Leverages a 0MB abstract virtual tensor template to pre-emptively lower and lock the execution graph 
              directly into accelerator caches, permanently eradicating runtime JIT compilation latency jitter at the system boot boundary.
         """
-        # [보정] ShapeDtypeStruct 추상 메타데이터 객체로부터 안전하게 실제 메모리 블록 유도 (zeros_like 사용으로 인한 구조체 파산 원천 방어)
+               # [보정] ShapeDtypeStruct 추상 메타데이터 객체로부터 안전하게 실제 메모리 블록 유도 (zeros_like 사용으로 인한 구조체 파산 원천 방어)
+        # [FIX] Safely derive actual memory blocks from the ShapeDtypeStruct abstract metadata object 
+        #       (Fundamentally defending against struct collapse caused by zeros_like usage)
         # [FIX] Precision-mapped back to the MEMORY_LAYOUT_REGISTRY specs, dispatching explicit shape and dtype specifications.
         dummy_state: Dict[str, jax.Array] = {
-            "param_w": jnp.zeros(MEMORY_LAYOUT_REGISTRY["param_w"].shape, dtype=MEMORY_LAYOUT_REGISTRY["param_w"].dtype),       # 어텐션 소버린 가중치 중심 유동장 레일
-            "spatial_u": jnp.zeros(MEMORY_LAYOUT_REGISTRY["spatial_u"].shape, dtype=MEMORY_LAYOUT_REGISTRY["spatial_u"].dtype),   # FNG V3 Pre-rectified Key Rail
-            "spatial_v": jnp.zeros(MEMORY_LAYOUT_REGISTRY["spatial_v"].shape, dtype=MEMORY_LAYOUT_REGISTRY["spatial_v"].dtype),   # FNG V3 Pre-rectified Value Rail
-            "adaptive_gain": jnp.ones(MEMORY_LAYOUT_REGISTRY["adaptive_gain"].shape, dtype=MEMORY_LAYOUT_REGISTRY["adaptive_gain"].dtype), # 자율 튜닝 스케일 가중치 항상성 이득 변수
-            "cell_status": jnp.zeros(MEMORY_LAYOUT_REGISTRY["cell_status"].shape, dtype=MEMORY_LAYOUT_REGISTRY["cell_status"].dtype), # 무분기 하드웨어 MUX 쉴드 상태 비트
-            "coordinate_id": jnp.arange(self.config["num_grid_points"], dtype=jnp.uint32)                                         # FNG V3 분산 격자 좌표 ID
+            "param_w": jnp.zeros(MEMORY_LAYOUT_REGISTRY["param_w"].shape, dtype=MEMORY_LAYOUT_REGISTRY["param_w"].dtype),       
+            # 어텐션 소버린 가중치 중심 유동장 레일
+            # Attention sovereign weight-centered fluid field rails
+            
+            "spatial_u": jnp.zeros(MEMORY_LAYOUT_REGISTRY["spatial_u"].shape, dtype=MEMORY_LAYOUT_REGISTRY["spatial_u"].dtype),   
+            # FNG V3 Pre-rectified Key Rail
+            # FNG V3 Pre-rectified Key Rail
+            
+            "spatial_v": jnp.zeros(MEMORY_LAYOUT_REGISTRY["spatial_v"].shape, dtype=MEMORY_LAYOUT_REGISTRY["spatial_v"].dtype),   
+            # FNG V3 Pre-rectified Value Rail
+            # FNG V3 Pre-rectified Value Rail
+            
+            "adaptive_gain": jnp.ones(MEMORY_LAYOUT_REGISTRY["adaptive_gain"].shape, dtype=MEMORY_LAYOUT_REGISTRY["adaptive_gain"].dtype), 
+            # 자율 튜닝 스케일 가중치 항상성 이득 변수
+            # Autonomously tuned scale-weighted homeostatic gain variables
+            
+            "cell_status": jnp.zeros(MEMORY_LAYOUT_REGISTRY["cell_status"].shape, dtype=MEMORY_LAYOUT_REGISTRY["cell_status"].dtype), 
+            # 무분기 하드웨어 MUX 쉴드 상태 비트
+            # Branchless hardware MUX shield status bits
+            
+            "coordinate_id": jnp.arange(self.config["num_grid_points"], dtype=jnp.uint32)                                         
+            # FNG V3 분산 격자 좌표 ID
+            # FNG V3 distributed grid coordinate IDs
         }
         
         # [KR] JAX 하부 트레이서를 우회하여 최최외곽 마스터 컴파일 트랙(_fused_xla_update_step)을 가속기 기계어 단 캐시에 영구 고정(Hard Locking)
@@ -273,14 +292,32 @@ class ContinuousWaveFieldLlmBrain:
         [KR] 곱셈과 덧셈 명령어를 단일 FMA 기계어로 압착하여 데이터를 가속기 내부에서 In-place로 원자적 갱신합니다.
         [EN] Fused Hardware ALU Pipeline Engagement Map: Compresses arithmetic primitives into single-cycle FMA codes to eliminate execution stalls. [1.3]
         """
-        # 1. 이전 타임스텝의 하드웨어 물리 상태 제어선 수입 (FNG V3 6채널 SoA 독립 버스 인터록)
+       # 1. 이전 타임스텝의 하드웨어 물리 상태 제어선 수입 (FNG V3 6채널 SoA 독립 버스 인터록)
         # [EN] 1. Ingests low-level physical state control tracks (Precision-coupled with FNG V3 6-channel SoA layout)
-        param_w       = current_state["param_w"]       # 어텐션 소버린 가중치 중심 유동장 레지스터
-        spatial_u     = current_state["spatial_u"]     # [수리 물리 교정] FNG V3 Pre-rectified Key Delta Stream
-        spatial_v     = current_state["spatial_v"]     # [수리 물리 교정] FNG V3 Pre-rectified Value Delta Stream
-        adaptive_gain = current_state["adaptive_gain"] # 자율 튜닝 스케일 가중치 항상성 이득 변수
-        cell_status   = current_state["cell_status"]   # 무분기 하드웨어 MUX 쉴드 상태 비트
-        coordinate_id = current_state["coordinate_id"] # FNG V3 분산 격자선 상 고유 기하 좌표 ID
+        # [EN]    with FNG V3 6-channel SoA independent bus interlock system
+        param_w       = current_state["param_w"]       
+        # 어텐션 소버린 가중치 중심 유동장 레지스터
+        # [EN] Attention sovereign weight-centered fluid field registers
+        
+        spatial_u     = current_state["spatial_u"]     
+        # [수리 물리 교정] FNG V3 Pre-rectified Key Delta Stream
+        # [EN] [Mathematical Physics Rectification] FNG V3 Pre-rectified Key Delta Stream
+        
+        spatial_v     = current_state["spatial_v"]     
+        # [수리 물리 교정] FNG V3 Pre-rectified Value Delta Stream
+        # [EN] [Mathematical Physics Rectification] FNG V3 Pre-rectified Value Delta Stream
+        
+        adaptive_gain = current_state["adaptive_gain"] 
+        # 자율 튜닝 스케일 가중치 항상성 이득 변수
+        # [EN] Autonomously tuned scale-weighted homeostatic gain variables
+        
+        cell_status   = current_state["cell_status"]   
+        # 무분기 하드웨어 MUX 쉴드 상태 비트
+        # [EN] Branchless hardware MUX shield status bits
+        
+        coordinate_id = current_state["coordinate_id"] 
+        # FNG V3 분산 격자선 상 고유 기하 좌표 ID
+        # [EN] Unique geometric coordinate IDs on the FNG V3 distributed grid lines
 
         # 2. 물리 정정된 순방향 전방 관통형 와도 반전 및 버거스 점성 감쇠 벡터 추출
         # [EN] 2. Extracts pre-rectified forward-only vorticity and Burgers dissipation adjustment vectors
@@ -391,11 +428,13 @@ class ContinuousWaveFieldLlmBrain:
         [KR] XLA 기계어 슬롯에 락킹되어 있던 자원 연결선을 호스트 단의 명령으로 명시적이고 즉각적으로 완전 청산하여 VRAM 메모리 누수를 원천 봉쇄합니다.
         [EN] Explicit Component Terminator: Deallocates pre-compiled machine-code slots directly from accelerator cache tracks to permanently prevent memory leakages.
         """
-        if hasattr(self, "_compiled_update_fn") and self._compiled_update_fn is not None:
+       if hasattr(self, "_compiled_update_fn") and self._compiled_update_fn is not None:
             # 컴파일된 기계어 함수 객체를 가속기 단에서 명시적으로 완전 삭제
+            # [EN] Explicitly purge compiled machine-code function objects from the accelerator level
             del self._compiled_update_fn
             self._compiled_update_fn = None
             print("[👑 Layer 2-6] ContinuousWaveFieldLlmBrain Core Infrastructure Successfully Terminated.")
+
 
     def __del__(self) -> None:
         """
@@ -403,13 +442,18 @@ class ContinuousWaveFieldLlmBrain:
         [KR] 사용자가 terminate() 호출을 누락했을 때 가비지 컬렉터(GC)에 의해 자동 기폭되는 예비 안전 방화벽 소멸자입니다. Global Shutdown 시점의 인터프리터 분쇄 예외를 묵음 처리합니다.
         [EN] Safe Backup Destructor: Serves as an emergency firewall destructor executing silent, isolated cache disposal during global process teardown.
         """
-        try:
+               try:
             # 컴파일 함수 해제 프로세스만 독점하여 안전하게 수행 (글로벌 셧다운 시점의 print 소멸 크래시 원천 격리 방어)
+            # [EN] Exclusively and safely execute the compiled function release process 
+            #       (Fundamentally isolating and defending against print destruction crashes during global shutdown)
             if hasattr(self, "_compiled_update_fn") and self._compiled_update_fn is not None:
                 del self._compiled_update_fn
         except Exception:
             # 프로세스 종료 시점에 발생하는 모든 파이썬 인터프리터 부차적 바인딩 파산 예외를 원자적으로 묵음 처리 (Silent Guard)
+            # [EN] Atomically silence all secondary Python interpreter binding collapse exceptions 
+            #       occurring at process termination (Silent Guard)
             pass
+
 
 # =====================================================================================
 # [🔒 MODULE SYSTEM GLOBAL IMMUTABILITY SYSTEM ANCHOR]
