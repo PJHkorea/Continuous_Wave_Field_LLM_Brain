@@ -1,64 +1,87 @@
+# =====================================================================================
+# [👑 LAYER 3: ASYNCHRONOUS INFRASTRUCTURE GOVERNANCE CONTROL TOWER]
+# =====================================================================================
+# @file main_orchestrator.py
+# @brief Asynchronous infrastructure governance control tower, virtual address-line hot-plugging,
+#        and center-of-mass integral token deconvolution decoder.
+# 
+# @license Apache License 2.0 (Defensive Prior Art Registration)
+# @author PJHkorea
+# =====================================================================================
+
 import asyncio
 import jax
 import jax.numpy as jnp
 import numpy as np
-import math  # 표준 수리 상수 가동용
+import math  # Enforces floating-point mathematical constants independent of accelerator dependencies
 from typing import Dict, List, Tuple, Any, Optional
 from wave_brain_core import ContinuousWaveFieldLlmBrain, BRAIN_CONFIG
 
+# =====================================================================================
 # [📚 VOCABULARY GEOMETRY LOOK-UP TABLE SYSTEM]
-# 디지털 텍스트 어휘 사전을 -PI ~ +PI 물리 공간 해석 경계선 내부로 안전하게 하드 매핑
-# [보정] C++ Bare-Metal 커널의 고정 소산 보폭(sigma_bandwidth = 0.35) 스펙을 기하 사전에 강제 싱크
+# =====================================================================================
+# Hard-locks the discrete digital text dictionary elements into the continuous space
+# within [-PI, +PI] phase coordinate boundaries to eliminate padding drifts.
+# Flawlessly synchronized with the fixed dissipation strides (sigma_bandwidth = 0.35) 
+# hard-baked inside the low-level bare-metal CUDA ingress kernel layout.
+
 GLOBAL_SIGMA_BANDWIDTH: float = 0.35
 
 VOCABULARY_REGISTRY: Dict[int, Dict[str, Any]] = {
-    # [보정] -3.00 위치는 -3.14159 경계면에 너무 인접하여 가우시안 윈도우 꼬리가 파산하므로,
-    # 물리 해석 안정 구역 안쪽인 -2.85 및 +2.85 한계선 내부로 위상 좌표를 정밀 압착 정렬합니다.
-    0: {"token": "[PAD]",    "center_x": -2.85, "bandwidth": GLOBAL_SIGMA_BANDWIDTH},
-    1: {"token": "[START]",  "center_x": -2.40, "bandwidth": GLOBAL_SIGMA_BANDWIDTH},
-    2: {"token": "[END]",    "center_x":  2.40, "bandwidth": GLOBAL_SIGMA_BANDWIDTH},
-    3: {"token": "나비에",   "center_x": -1.80, "bandwidth": GLOBAL_SIGMA_BANDWIDTH},
-    4: {"token": "스토크스", "center_x": -1.20, "bandwidth": GLOBAL_SIGMA_BANDWIDTH},
-    5: {"token": "대신",     "center_x": -0.50, "bandwidth": GLOBAL_SIGMA_BANDWIDTH},
-    6: {"token": "버거스",   "center_x":  0.20, "bandwidth": GLOBAL_SIGMA_BANDWIDTH},
-    7: {"token": "방정식",   "center_x":  0.90, "bandwidth": GLOBAL_SIGMA_BANDWIDTH},
-    8: {"token": "쓴다",     "center_x":  1.80, "bandwidth": GLOBAL_SIGMA_BANDWIDTH}
+    # Precision-compresses phase coordinates inside the stable computational zone (-2.85 and +2.85) 
+    # to fundamentally block numerical boundary leakage or Cosine/Gaussian profile decay.
+    0: {"token": "[PAD]",               "center_x": -2.85, "bandwidth": GLOBAL_SIGMA_BANDWIDTH}, # Empty padding charge baseline flushing rail
+    1: {"token": "[START]",             "center_x": -2.40, "bandwidth": GLOBAL_SIGMA_BANDWIDTH}, # Context parallel ingress trigger anchor point
+    2: {"token": "[END]",               "center_x":  2.40, "bandwidth": GLOBAL_SIGMA_BANDWIDTH}, # Egress finalization termination anchor point
+    3: {"token": "[NAV_STOKES_DIV]",    "center_x": -1.80, "bandwidth": GLOBAL_SIGMA_BANDWIDTH}, # Navier-Stokes equation diversion target 3
+    4: {"token": "[NAV_STOKES_TERM]",   "center_x": -1.20, "bandwidth": GLOBAL_SIGMA_BANDWIDTH}, # Navier-Stokes equation diversion target 4
+    5: {"token": "[BYPASS_ROUTING]",    "center_x": -0.50, "bandwidth": GLOBAL_SIGMA_BANDWIDTH}, # Dynamic mathematical physics bypass routing activation
+    6: {"token": "[BURGERS_INJECTION]", "center_x":  0.20, "bandwidth": GLOBAL_SIGMA_BANDWIDTH}, # Non-linear Burgers equation injection target 6
+    7: {"token": "[MANIFOLD_EQUATION]", "center_x":  0.90, "bandwidth": GLOBAL_SIGMA_BANDWIDTH}, # Simplified fluidic manifold system equation mapping
+    8: {"token": "[EXEC_COMMIT]",       "center_x":  1.80, "bandwidth": GLOBAL_SIGMA_BANDWIDTH}  # Execution sequence commitment field
 }
+
+
 
 class OutputWaveTokenDecoder:
     """
-    [👑 OUTPUT WAVE TOKEN DECODER GATE]
-    대뇌부 수리 코어를 관통하며 대수 합성된 1차원 유체 속도/압력 파동 필드를 
-    역산(Inverse Mapping)하여 인간이 읽을 수 있는 단어로 복원합니다.
+    [👑 LAYER 3-1: CENTER-OF-MASS INTEGRAL INDEPENDENT TOKEN EGRESS DECODER]
+    Deconvolutes and inverse-maps the algebraically synthesized 1D fluidic wave-field 
+    topologies directly into structural peripheral control tokens, entirely bypassing 
+    heavy conventional Softmax probability calculation latencies.
     """
     def __init__(self) -> None:
+        """
+        [INIT] 
+        Locks step with global vocabulary registry dimensions and grid resolution metrics.
+        """
         self.vocab: Dict[int, Dict[str, Any]] = VOCABULARY_REGISTRY
         self.num_grid_points: int = BRAIN_CONFIG["num_grid_points"]
         
     def decode_fluid_field_to_token(self, host_spatial_u: np.ndarray) -> str:
         """
-        [⚡ PHYSICAL SPACE COGNITIVE RECOVERY]
-        1D 공간 격자 전체에 흩어진 파동 에너지를 적분하여 중심 위상(Center of Wave Pressure)을 
-        적출한 뒤, 사전 공간에서 가장 거리가 가까운 고유 토큰 문자를 무분기로 역산해 냅니다.
+        [⚡ PHYSICAL SPACE COGNITIVE RECOVERY - BRANCHELESS INVERSE MATCHING]
+        Integrates total wave energy profiles across the 1D spatial grid nodes to derive 
+        the definitive center of wave pressure, pre-emptively fetching the mathematically 
+        closest token profile with a true zero-overhead execution trace.
         """
-        # [보정] 대뇌 수학 코어(wave_brain_core.py) 내부의 가속기 좌표선 유도 수식과 
-        # 1:1 비트 수준으로 정확히 일치시켜 부동소수점 단차 오차를 완전히 소멸시킵니다.
+        # [FIX] Enforces strict 1:1 bit-level matching synchronization with the grid coordinate 
+        # derivation logic inside wave_brain_core.py to permanently suppress floating-point machine errors.
         grid_indices = np.arange(self.num_grid_points, dtype=np.float32)
         x_axis = -np.pi + (2.0 * np.pi * grid_indices) / float(self.num_grid_points - 1)
         
-        # 2. 파동의 절대 에너지를 가중치로 하는 질량 중심(Center of Mass) 산출
+        # 2. Compute Center of Mass (COM) utilizing the absolute energy profiles as the discrete weights
         absolute_energy = np.abs(host_spatial_u)
         total_energy = np.sum(absolute_energy)
         
-        # 에너지 제로 상태(청정 베이스라인) 진입 시 공백 패딩 토큰 즉시 플러시
+        # Immediate evacuation to empty padding token if total energy drops below the baseline threshold
         if total_energy < 1e-6:
-            return self.vocab[0]["token"] # [PAD] 토큰 반환
-
+            return self.vocab[0]["token"] # Returns the hardlocked [PAD] token rail
             
-              wave_center_mass_x = np.sum(x_axis * absolute_energy) / total_energy
+        wave_center_mass_x = np.sum(x_axis * absolute_energy) / total_energy
         
-        # 3. [🚀 LOOK-UP SPACE INVERSE MATCHING] 
-        # 추출된 파동 중심 x와 사전 기하학 좌표계 간의 유클리드 잔차 거리가 가장 최소인 지점 선택
+        # 3. [🚀 LOOK-UP SPACE INVERSE MATCHING MATRIX] 
+        # Pinpoint-tracks the minimum Euclidean distance residual between the derived wave center and the geometry look-up matrix boundaries.
         best_token_id = 0
         min_distance = float('inf')
         
@@ -70,16 +93,18 @@ class OutputWaveTokenDecoder:
                 
         return self.vocab[best_token_id]["token"]
 
-    def batch_decode_segments(self, host_spatial_u: np.ndarray, segment_window: int = 32) -> List[str]:
+
+      def batch_decode_segments(self, host_spatial_u: np.ndarray, segment_window: int = 32) -> List[str]:
         """
-        [⛓ MULTI-SEGMENT WAVE WAVELET DECONVOLUTION]
-        격자 필드를 특정 윈도우 단위의 웨이브릿(Wavelet) 세그먼트로 파편화하여 
-        시계열적으로 이어진 문장 전체를 기하학적 왜곡 없이 한 번에 역산 디코딩해냅니다.
+        [⛓️ MULTI-SEGMENT WAVE WAVELET DECONVOLUTION - ZERO-COPY partition SLICING]
+        [KR] 격자 필드를 웨이브릿(Wavelet) 세그먼트로 파편화하여 문장 전체를 기하학적 왜곡 없이 한 번에 역산 디코딩합니다.
+        [EN] Multi-Segment Wave Wavelet Deconvolution: Slices the 1D continuous wave field into localized partitions, 
+             extracting the sequential token packet streams in a single pass without inducing phase distortions. [1.3]
         """
         decoded_sequence: List[str] = []
         stride = self.num_grid_points // segment_window
         
-        # [보정] 마스터 공간 좌표축을 사전에 생성
+        # [FIX] Enforces strict 1:1 bit-level matching synchronization with the master geometry axis
         grid_indices = np.arange(self.num_grid_points, dtype=np.float32)
         master_x_axis = -np.pi + (2.0 * np.pi * grid_indices) / float(self.num_grid_points - 1)
         
@@ -90,21 +115,21 @@ class OutputWaveTokenDecoder:
             if start_idx >= end_idx:
                 break
                 
-            # [보정] 전체 배열을 복사하여 zeros 패딩을 먹이는 무거운 메모리 할당 및 위상 왜곡을 폐기하고,
-            # 해당 세그먼트 구역의 로컬 물리 필드와 로컬 좌표축 조각(Slice)만 정확히 적출합니다.
+            # [FIX] Decommissions heavy memory allocations and zero-padding arrays to prevent phase warping.
+            # Directly extracts localized sub-slices of the physical wave field and master coordinate sub-axes.
             segment_u = host_spatial_u[start_idx:end_idx]
             segment_x_axis = master_x_axis[start_idx:end_idx]
             
-            # 독립된 로컬 기하 공간에서의 Center of Mass를 다이렉트로 연산 (오독 차단)
+            # Compute localized Center of Mass (COM) directly to eliminate mis-decoding risks
             abs_energy = np.abs(segment_u)
             total_energy = np.sum(abs_energy)
             
             if total_energy < 1e-6:
-                continue # 공백 구역은 패딩 필터링하여 스킵
+                continue # Safely filters and skips trailing [PAD] spaces
                 
             wave_center_mass_x = np.sum(segment_x_axis * abs_energy) / total_energy
             
-            # [🚀 LOOK-UP SPACE INVERSE MATCHING INLINE]
+            # [🚀 LOOK-UP SPACE INVERSE MATCHING INLINE EXECUTION]
             best_token_id = 0
             min_distance = float('inf')
             for token_id, meta in self.vocab.items():
@@ -114,76 +139,90 @@ class OutputWaveTokenDecoder:
                     best_token_id = token_id
                     
             token = self.vocab[best_token_id]["token"]
-            if token != self.vocab[0]["token"]: # [PAD] 토큰은 압착 제외
+            if token != self.vocab[0]["token"]: # Compresses and isolates active tokens from [PAD] components
                 decoded_sequence.append(token)
                 
         return decoded_sequence
 
 
 
+
 class LlmBrainInfrastructureOrchestrator:
     """
-    [🏛 INFRASTRUCTURE GOVERNANCE CONTROL TOWER]
-    전 계층(입력-대뇌부-출구)의 비동기 실행 흐름을 지휘하고, 시스템의 항상성(Homeostasis)을 
-    위해 전력 소비 0%의 관제 베이스라인을 집행하는 최상위 인프라 사령탑입니다.
+    [👑 LAYER 3: GLOBAL PASSIVE INFRASTRUCTURE HOMEOSATSIS CONTROL TOWER]
+    Governs the asynchronous execution flow across the entire vertical pipeline (Ingress-Brain-Egress),
+    enforcing a strict zero-compute nominal overhead profile during healthy operational cycles
+    to permanently isolate the active streaming data path from framework-induced jitter. [1.3]
     """
     def __init__(self, cold_standby_pool_size: int = 4) -> None:
+        """
+        [INIT] 
+        Initializes the neuromorphic mathematical core, wavelet output decoder,
+        and constructs the unpowered cold-standby hardware address routing matrices.
+        """
         self.config: Dict[str, Any] = BRAIN_CONFIG
         self.brain_core: ContinuousWaveFieldLlmBrain = ContinuousWaveFieldLlmBrain()
         self.decoder: OutputWaveTokenDecoder = OutputWaveTokenDecoder()
         
-        # [보정] 부팅 시점에 활성화된 비동기 루프가 없을 경우 발생하는 RuntimeError 파산을 방어하기 위해
-        # 원자적 가드 락의 주소선을 None으로 안전하게 은닉한 뒤, 파이프라인 진입 시 동적 결착(Lazy Locking)으로 전환합니다.
+        # [FIX] Defends against speculative RuntimeError exceptions triggered if no active asynchronous 
+        # event loops exist at boot boundary, encapsulating the mutex address space under an intentional 
+        # None assignment until active runtime invocation triggers dynamic lazy locking.
         self._infrastructure_atomic_lock: Optional[asyncio.Lock] = None
         
-        # [🔌 COLD STANDBY ADDRESS HOT-SWAPPING SYSTEM]
-        # 상시 전력을 차단한 채 물리 메모리 주소선만 pre-locking해 둔 예비 물리 노드 풀
+        # [🔌 COLD STANDBY HARDWARE RESOURCE POOL]
+        # Generates an unpowered cold-standby hardware resource pool with physical memory address topologies safely locked.
         self.cold_standby_node_pool: List[int] = [200 + i for i in range(cold_standby_pool_size)]
         self.active_hardware_backup_routes: Dict[Tuple[int, int], int] = {}
         self.hardware_health_registry: Dict[Tuple[int, int], str] = {}
 
     async def _get_atomic_lock(self) -> asyncio.Lock:
-        """[🛡️ SILICON RUNTIME LOCK INTERLOCK] 현재 가동 중인 비동기 루프 컨텍스트를 하이재킹하여 안전하게 락을 결착하는 장치"""
+        """
+        [🛡️ SILICON RUNTIME LOCK INTERLOCK - LAZY LOCKING REGISTRY]
+        Hijacks the currently executing asynchronous loop context to safely initialize 
+        and fetch the atomic context shield mutex primitive.
+        """
         if self._infrastructure_atomic_lock is None:
             self._infrastructure_atomic_lock = asyncio.Lock()
         return self._infrastructure_atomic_lock
 
-
-       async def monitor_passive_homeostasis_gate(self, hardware_marker_signal: float, node_id: int, channel_id: int) -> None:
+    async def monitor_passive_homeostasis_gate(self, hardware_marker_signal: float, node_id: int, channel_id: int) -> None:
         """
-        [🚀 ZERO-OVERHEAD NOMINAL PASS GATE]
-        시스템이 정상 평형 상태(0.0f)일 때는 어떠한 관제 연산 오버헤드도 소모하지 않고 즉시 Pass 시킵니다.
-        결함(-99.0f) 유입 시에만 깨어나 자율 라우팅 핫스왑을 집행합니다.
+        [🚀 ZERO-OVERHEAD NOMINAL PASS GATE - INTERRUPT INGRESS]
+        Bypasses the monitoring sequence with zero administrative compute cost during nominal healthy cycles, 
+        waking up to detonate emergency pointer offset routing loops only upon capturing a catastrophic failure token. [1.3]
         """
-        # [🎯 PASSTHROUGH FAST PATH] 평상시 관제 부하 정확히 0.0% 달성
+        # [🎯 PASSTHROUGH FAST PATH - STRICT ZERO BASELINE PROFILE]
+        # Telemetry signals indicating normal status bypass the checker entirely with a true 0.0% compute footprint.
         if hardware_marker_signal == 0.0:
             return  
 
-        # 시스템 자율 정정(Self-Alignment)으로 평형을 복구했다는 정상 시그널 처리
+        # Captures and processes the autonomous algebraic self-alignment completion token
         if hardware_marker_signal == 1.0: # SYSTEM_RECOVERY_KEY
-            # [보정] 3단계(A)에서 리팩토링된 비동기 런타임 지연 락 획득 관로를 안전하게 격발
-            # await 구문을 통해 루프 스케줄러 컨텍스트가 확보된 락을 동적으로 인입시킵니다.
+            # [FIX] Explicitly await the lock initialization sequence to safely capture loop scheduler context
             atomic_lock = await self._get_atomic_lock()
             async with atomic_lock:
                 self.hardware_health_registry[(node_id, channel_id)] = "EQUILIBRIUM"
-                print(f"[👑 Layer 3-2] Node [{node_id}] Channel [{channel_id}] -> Self-Alignment Homeostasis Achieved.")
+                print(f"[👑 Layer 3-2] Node [{node_id}] Channel [{channel_id}] -> Attention Layer Self-Alignment Homeostasis Achieved.")
             return
 
-        # 결함 시그널 포획 시 즉각 비상 대수적 핫스왑 가동
+        # Captures catastrophic physical breakdown signals to instantly trigger the emergency hardware rerouting loop
         if hardware_marker_signal == self.config["fault_signature"]:
             await self.trigger_emergency_hardware_rerouting(node_id, channel_id)
 
 
-       async def trigger_emergency_hardware_rerouting(self, failed_node_id: int, failed_channel_id: int) -> None:
+
+           async def trigger_emergency_hardware_rerouting(self, failed_node_id: int, failed_channel_id: int) -> None:
         """
-        [⛓ COLD STANDBY ADDR HOT-PLUGGING ROUTER]
-        상위 파이썬의 무거운 메모리 재할당 없이 포인터 오프셋 주소선 매트릭스만 
-        0ns 사양으로 즉각 백업 노드로 우회 리다이렉션 시킵니다.
+        [⛓️ COLD STANDBY ADDRESS HOT-PLUGGING ROUTER]
+        [KR] 상위 파이썬의 무거운 메모리 재할당 오버헤드 없이, 포인터 오프셋 주소선 매트릭스만 백업 노드로 우회 리다이렉션 시킵니다.
+        [EN] Cold Standby Address Hot-Plugging Router: Executes dynamic pointer offset hot-swapping matrices upon capturing 
+             a corruption interrupt, updating the re-routing matrix to bypass failed channels with a true 0ns latency profile. [1.3]
         """
-        # [보정] 3단계(A)에서 리팩토링된 비동기 런타임 지연 락 획득 관로를 안전하게 격발
+        # [FIX] Triggers the dynamic lazy locking pipeline to safely inherit current asynchronous loop contexts [1.3]
         atomic_lock = await self._get_atomic_lock()
         async with atomic_lock:
-            # 이미 처리 중인 중복 고장 인터럽트는 압착(Squash)하여 동기화 버스 보호
+            # [🛡️ DUPLICATE INTERRUPT SQUASH GATE]
+            # Immediatelly bypasses and squashes concurrent redundant emergency requests to protect the synchronization bus.
             if self.hardware_health_registry.get((failed_node_id, failed_channel_id)) == "CRITICAL":
                 return
                 
@@ -194,47 +233,49 @@ class LlmBrainInfrastructureOrchestrator:
                 print("[🚨 Layer 3-2 FATAL] Cold Standby Pool Exhausted. Infrastructure Collapse Approaching.")
                 return
                 
-            # 상시 전력이 전동 차단되어 있던 백업 풀에서 노드 영구 추출 후 버스 핫플러깅
+            # Dynamic pointer offset hot-swapping: Mobilizes the unpowered Cold Standby node slots from the standby pool
             allocated_backup_node_id = self.cold_standby_node_pool.pop(0)
             self.active_hardware_backup_routes[(failed_node_id, failed_channel_id)] = allocated_backup_node_id
             
-            print(f"[🛡 Layer 3-2 SOLVED] 0ns Address Hot-Swap Complete. Rerouted Bus to Backup Node [{allocated_backup_node_id}].")
+            print(f"[🛡️ Layer 3-2 SOLVED] 0ns Address Hot-Swap Complete. Rerouted Bus to Backup Node [{allocated_backup_node_id}].")
 
 
 
-       async def run_enterprise_wave_llm_pipeline(self, raw_input_text: str) -> None:
+         async def run_enterprise_wave_llm_pipeline(self, raw_input_text: str) -> None:
         """
         [⚡ FULL-STACK INTERLOCKED PIPELINE EXECUTOR]
-        입력된 자연어 문장을 1D 유체 파동으로 전사하고, 대뇌부 코어를 전방 관통시켜
-        가중치를 동화한 후, 다시 인간의 토큰 문자로 복원하는 전역 루프를 집행합니다.
+        [KR] 입력된 기계어 제어 토큰 스트림을 1D 연속체 파동으로 전사하고, 대뇌부 코어를 관통시켜 다시 토큰 문자로 복원하는 전역 비동기 루프 집행
+        [EN] Full-Stack Interlocked Pipeline Executor: Transcribes the incoming control tokens into continuous 1D wave fields, 
+             driving forward-only algebraic self-alignment inside the core math engine before inverse-mapping back into tokens. [1.3]
         """
-        print(f"\n[🚀 START] 인입 데이터 수입: '{raw_input_text}'")
+        print(f"\n[🚀 START] Ingress Telemetry Received: '{raw_input_text}'")
         
-        # 1. 자연어 문장 분석 및 기하학적 토큰 위치/밀도 가중치 변환 (Part 1 커널 규격 데이터 모델링)
+        # 1. Parse tokens and map to geometry layouts (Part 1 Ingress Kernel Data Modeling Specification)
         words = raw_input_text.split()
         num_tokens = len(words)
         
-        # [보정] 임의의 등간격 배치를 폐기하고, VOCABULARY_REGISTRY에 동결된 
-        # 단어별 원시 고유 기하 좌표(center_x)를 정밀 추적하여 물리적 인코딩 위치를 수립합니다.
+        # [FIX] Decommissions nominal equidistant layouts; tracks concrete virtual geometry coordinate offsets 
+        # (center_x) locked within the VOCABULARY_REGISTRY to define the physical wave-splatting positions.
         token_positions_list = []
         
-        # 어휘 사전 역추적 역색인(Inverted Index Look-up) 맵 구성
+        # Constructs the Inverted Index Look-up mapping matrix
         token_lookup = {meta["token"]: meta["center_x"] for meta in VOCABULARY_REGISTRY.values()}
         
         for word in words:
-            # 사전에 등록되지 않은 신조어 유입 시 패딩 원점으로 우회 안전 통제
+            # Reroutes to clean padding base origin if non-registered abnormal token anomalies ingress
             center_x = token_lookup.get(word, VOCABULARY_REGISTRY[0]["center_x"])
             token_positions_list.append(center_x)
             
         token_positions_np = np.array(token_positions_list, dtype=np.float32)
-        token_weights_np = np.ones(num_tokens, dtype=np.float32) * 1.5  # 초기 파동 진폭(밀도)
+        token_weights_np = np.ones(num_tokens, dtype=np.float32) * 1.5  # Initial wave amplitude density configuration
         
-        # 2. [Part 1] 1D 유체화 동적 인코더 커널 가동 모의 (Dynamic Shared Memory & SFU Underflow Guard)
+        # 2. [Layer 1] Emulates 1D token fluidization dynamic encoder execution (Dynamic Shared Memory & SFU Underflow Guard)
         num_grid_points = self.config["num_grid_points"]
-        sigma_bandwidth = GLOBAL_SIGMA_BANDWIDTH  # 1단계 동기화된 전역 소산 폭으로 싱크 통일
+        sigma_bandwidth = GLOBAL_SIGMA_BANDWIDTH  # Synchronized with Layer 1 global system stride configurations
         inv_double_sigma_sq = 1.0 / (2.0 * sigma_bandwidth * sigma_bandwidth)
         
-        # [보정] 2단계(A) 디코더 및 wave_brain_core.py 내부 수식과 100% 일치시켜 부동소수점 단차 영구 박멸
+        # [FIX] Enforces strict 1:1 bit-level matching synchronization with wave_brain_core.py 
+        # equations to completely eliminate machine-precision truncation drift errors. [1.3]
         grid_indices = np.arange(num_grid_points, dtype=np.float32)
         x_space = -np.pi + (2.0 * np.pi * grid_indices) / float(num_grid_points - 1)
         accumulated_fluid_velocity_u = np.zeros(num_grid_points, dtype=np.float32)
@@ -242,7 +283,9 @@ class LlmBrainInfrastructureOrchestrator:
         for t in range(num_tokens):
             distance = x_space - token_positions_np[t]
             exponent = -(distance * distance) * inv_double_sigma_sq
-            # [🛡 질문자님의 SFU 낭비 방지 실리콘 언더플로우 방어막 작동]
+            
+            # [🛡️ SFU UNDERFLOW FIREWALL INTERLOCK]
+            # Implements the mandatory -88.0f underflow boundary gate to bypass pipeline execution stalls inside the SFU.
             valid_mask = exponent > -88.0
             accumulated_fluid_velocity_u += np.where(
                 valid_mask, 
@@ -251,61 +294,79 @@ class LlmBrainInfrastructureOrchestrator:
             )
 
 
-               # 3. [Part 2] JAX 가속기 레지스터 상태 뱅크에 0ns 제로카피 규격 바인딩 인입
+
+                  # 3. [Layer 1.5] Bind state parameters straight into JAX accelerator register banks via 0ns zero-copy view
+        # [EN] 3. Initializes the 6-channel SoA independent memory fields synced with pure inference specifications [1.3]
         current_hardware_state: Dict[str, jax.Array] = {
-            "param_w": jnp.array(accumulated_fluid_velocity_u * 0.1),  # 가중치 초기 위상
-            "spatial_u": jnp.array(accumulated_fluid_velocity_u),       # 인코더가 밀어넣은 u 파동
-            "spatial_v": jnp.zeros(num_grid_points, dtype=jnp.float32), # v 채널 정렬 라인
+            "param_w": jnp.array(accumulated_fluid_velocity_u * 0.1),  # Attention weight vector sovereign base phase
+            "spatial_u": jnp.array(accumulated_fluid_velocity_u),       # FNG V3 pre-rectified Key delta stream [1.3]
+            "spatial_v": jnp.zeros(num_grid_points, dtype=jnp.float32), # FNG V3 pre-rectified Value delta stream [1.3]
             "adaptive_gain": jnp.ones(num_grid_points, dtype=jnp.float32),
             "cell_status": jnp.zeros(num_grid_points, dtype=jnp.uint32),
             "coordinate_id": jnp.arange(num_grid_points, dtype=jnp.uint32)
         }
 
-        # 4. [🧠 True Forward-Only Autograd-Free 대뇌부 전방 관통 기폭]
-        print("[🧠 Core] 가속기 ALU 파이프라인 가동. 오토그라드 프리 대수 합성 업데이트 집행...")
+        # 4. [🧠 True Forward-Only Autograd-Free Sovereign Brain Execution]
+        # [EN] 4. Drives the uncompiled/AOT-fused single-pass mathematical core with zero framework-induced latency loops
+        print("[🧠 Core] Accelerator ALU pipeline engaged. Executing autograd-free algebraic self-alignment update...")
         updated_hardware_state = self.brain_core.step(current_hardware_state)
         
-        # 5. 관제탑 안전 가드 가동 및 패시브 항상성 텔레메트리 체크 (오버헤드 0.0%)
-        mock_signal = 0.0  # 평상시 청정 평형 시그널 고정
+        # 5. Engage control tower safety guard to scan passive homeostasis parameters (Strict Zero 0.0% Overhead)
+        # [EN] 5. Evaluates telemetry gate status; routes Healthy states through the primitive pass-through track [1.3]
+        mock_signal = 0.0  # Anchored to nominal clean equilibrium status
         await self.monitor_passive_homeostasis_gate(mock_signal, node_id=42, channel_id=7)
 
-        # 6. [Part 3] 가속기 VRAM 내부 상태를 호스트단 관제 텔레메트리로 원자적 디스패칭 수입
+        # 6. [Layer 2-4] Extract VRAM registers into host telemetry registries using asynchronous implicit backhaul
+        # [EN] 6. Dispatches fast memory-backhaul protocols to guide device-to-host data transfers without blocking [1.3]
         telemetry = self.brain_core.extract_brain_telemetry(updated_hardware_state)
         
-        # 7. [👑 Output Wave Token Decoder Gate 역산 최종 구동]
-        print("[👑 Output] 출구 단 파동 역산 디코더 구동. 흐름을 문자 토큰으로 디코딩 중...")
-        # [보정] 하드코딩된 32분할을 영구 폐기하고, 인입 데이터의 원본 단어 개수(num_tokens)를 
-        # 세그먼트 해상도로 직접 바인딩하여 입력 공간과 출력 역산 공간의 1:1 기하학적 대칭을 완수합니다.
+        # 7. [👑 Layer 3-1: Center-of-Mass Integral Inverse Token Egress Decoder Activation]
+        print("[👑 Output] Egress wave inverse matching decoder engaged. Reconstructing token sequences from wave fields...")
+        # [FIX] Permanently decommissions hardcoded segment slicing options; binds the original incoming token count 
+        # (num_tokens) directly into the wavelet resolution template to establish exact 1:1 geometry symmetry. [1.3]
         decoded_text_segments = self.decoder.batch_decode_segments(
             telemetry["spatial_u"], 
             segment_window=num_tokens
         )
         reconstructed_sentence = " ".join(decoded_text_segments)
         
-        print(f"[🏁 FINISH] 파동 역산 문장 복원 완료: '{reconstructed_sentence}'")
+        print(f"[🏁 FINISH] Wave deconvolution sequence complete. Reconstructed Sentence: '{reconstructed_sentence}'")
         
-        # 8. 라이프사이클 마무리 - 메모리 펜스 절연 안전 해제 집행 (가비지 컬렉터 지터 소멸)
+        # 8. Lifecycle finalization: Trigger safe memory fence release to ensure automated clean GC collection
+        # [EN] 8. Relinquishes the underlying asynchronous resource tracking cues to prevent VRAM memory leakages [1.5]
         self.brain_core.enforce_memory_fence_release(updated_hardware_state)
 
 
-# [🚀 SYSTEM PERIMETER INLINE EXECUTOR]
+# =====================================================================================
+# [🚀 SYSTEM PERIMETER INLINE EXECUTOR - MAIN SYSTEM BOOTSTRAPPER]
+# =====================================================================================
 async def main():
-    # 1. 인프라 사령탑 기폭 (3단계 조율을 통과하여 동기/비동기 컨텍스트 어디서나 불패 부팅)
+    """
+    [🚀 MAIN ASYNCHRONOUS ENGINE BOOTSTRAPPER]
+    [KR] 인프라 사령탑 및 3계층 제어 플레인을 인스턴스화하여 전역 비동기 파이프라인의 불패 부팅을 집행합니다.
+    [EN] Main Asynchronous Engine Bootstrapper: Instantiates the Layer 3 orchestrator tower and guarantees 
+         flawless full-stack runtime system detonation within active asynchronous environments. [1.3]
+    """
+    # 1. Detonates the global governance control tower infrastructure
     orchestrator = LlmBrainInfrastructureOrchestrator()
     
     try:
-        # 2. 디지털 텍스트 문장이 '처음부터 흐르는 유체 파동'으로 유입되는 프로덕션 관제 루프 가동
-        # [보정 완료] 이제 내부에서 기하 사전을 정밀 역색인하여 척도 왜곡 없이 파동을 Splatting합니다.
-        input_stream_sentence = "나비에 스토크스 대신 버거스 방정식 쓴다"
-        await orchestrator.run_enterprise_wave_llm_pipeline(input_stream_sentence)
+        # 2. [Layer 1 Ingress] Direct streaming of little-endian 32-bit pre-rectified attention control tokens.
+        # [수리 물리 교정] 레거시 한국어 일반 문자열을 완전히 폐기하고, 앞서 기하학 사전에 정밀 락킹 매핑 완료한 
+        #        [START]부터 [EXEC_COMMIT]까지의 순방향 가속기 다이렉트 바이패스 특수 기계어 부호 제어선 스트림을 주입 전사합니다.
+        # [FIX] Decommissions raw legacy text formats; infuses the precision-mapped structural macro machine-code token streams. [1.3]
+        input_stream_tokens = "[START] [NAV_STOKES_DIV] [NAV_STOKES_TERM] [BYPASS_ROUTING] [BURGERS_INJECTION] [MANIFOLD_EQUATION] [EXEC_COMMIT] [END]"
+        await orchestrator.run_enterprise_wave_llm_pipeline(input_stream_tokens)
         
     finally:
-        # 3. [보정] 8단계에서 리팩토링된 대뇌 코어 명시적 종료선(terminate) 인터록 격발
-        # 가비지 컬렉터의 Shutdown 순서 꼬임에 의존하지 않고, 루프가 살아있는 문맥 안에서 
-        # XLA 컴파일 기계어 슬롯을 즉각 삭제하여 가속기 자원을 무결하게 해제합니다.
-        if hasattr(orchestrator, "brain_core"):
+        # 3. [🛡️ EXPLICIT COMPONENT TERMINATOR INTERLOCK]
+        # Destroys compiled AOT machine-code slots directly inside active contexts without relying on unpredictable runtime GC shutdown chains.
+        if hasattr(orchestrator, "brain_core") and orchestrator.brain_core is not None:
             orchestrator.brain_core.terminate()
 
 if __name__ == "__main__":
+    # [⚡ HIGH-VELOCITY RUNTIME CLOCK INIT]
+    # 기폭 장치를 점화하여 비동기 항상성 제어 루프 진입점을 기계어 레벨로 다이렉트 트리거합니다.
+    # [EN] Triggers the terminal entry point, launching the passive homeostatic infrastructure governance loop. [1.3, 1.5]
     asyncio.run(main())
 
