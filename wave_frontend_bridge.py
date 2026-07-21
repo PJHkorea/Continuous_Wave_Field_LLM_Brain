@@ -18,13 +18,17 @@ class CUDAInterfaceBridge:
     """
     [👑 LAYER 1.5: JAX ARRAY ADAPTER CAPSULE BINDER]
     C++ 단의 __cuda_array_interface__ 규격을 JAX/XLA 백엔드가 가로채도록 하는 프로토콜 팩토리
+    [👑 LAYER 1.5: JAX ARRAY ADAPTER CAPSULE BINDER]
+    Protocol factory allowing the JAX/XLA backend to intercept the C++ side __cuda_array_interface__ specification
     """
     def __init__(self, interface_dict: dict) -> None:
         if not isinstance(interface_dict, dict):
             raise TypeError("[🚨 CUDAInterfaceBridge] Input interface must be a standard python dictionary structure.")
         # FNG V3 명세에 맞춘 원시 데이터 격리
+        # Raw data isolation for FNG V3 spec
         self._raw_interface: Dict[str, Any] = interface_dict.get("__cuda_array_interface__", interface_dict)
         # 필수 3대 원소 유효성 검증 
+        # 3 essential elements validation
         assert all(key in self._raw_interface for key in ("data", "shape", "typestr")), \
             "[🚨 CUDAInterfaceBridge] Invalid CUDA Array Interface layout."
 
@@ -58,33 +62,40 @@ def fluidic_token_frontend_encoder(
     
       # 1. [📐 GAUSSIAN BROADCAST SCALING RULER]
     # 가우시안 소산 대역폭 역수 계산
+    # Gaussian dissipation bandwidth reciprocal calculation
     inv_double_sigma_sq = float(1.0 / (2.0 * (0.35 ** 2)))
     
     # 2. [🚀 COOPERATIVE ON-CHIP KERNEL DETONATION]
     # C++ 베어메탈 커널 가동 및 6대 채널 주소선 수집
+    # Calculate reciprocal of Gaussian dissipation bandwidth
     wave_ingress_interface.launch_wave_ingress_kernel(
         token_positions_ptr, token_weights_ptr, num_tokens, inv_double_sigma_sq, num_grid_points, mesh_cells_ptr
     )
     
     # 3. [⛓️ PHYSICAL ADDRESS DIRECT HIGHJACKING]
-    # 32바이트 보폭 오프셋 물리 주소 딕셔너리 수입 [1.3]
+    # 32바이트 보폭 오프셋 물리 주소 딕셔너리 수입 
+    # Import 32-byte stride offset physical address dictionary
     raw_views = wave_ingress_interface.bridge_raw_pointers_to_jax_view(mesh_cells_ptr, num_grid_points)
     
     # 4. [⚡ 6-CHANNEL SoA INDEPENDENT REGISTER TRANSPOSITION]
     # 제로카피 뷰 승격 및 6대 독립 채널 언팩 전사 (JAX/XLA NATIVE)
+    # Zero-copy view promotion and 6 independent channel unpack transposition (JAX/XLA NATIVE)
     
-    # FNG V3 정류 완료형 Key/Value 캐시 다양체 레일 언팩 [1.3]
+    # FNG V3 정류 완료형 Key/Value 캐시 다양체 레일 언팩 
+    # Unpack FNG V3 rectified Key/Value cache manifold rails
     spatial_u     = jnp.asarray(CUDAInterfaceBridge(raw_views["spatial_u"]))
     param_w       = jnp.asarray(CUDAInterfaceBridge(raw_views["param_w"]))
     spatial_v     = jnp.asarray(CUDAInterfaceBridge(raw_views["spatial_v"]))
     adaptive_gain = jnp.asarray(CUDAInterfaceBridge(raw_views["adaptive_gain"]))
     
     # JAX 백엔드 정수 템플릿과 1:1 싱크 일치하는 제어 및 기하 좌표 필드 주입
+    # Inject control and geometry coordinate fields synced 1:1 with JAX backend integer templates
     cell_status   = jnp.asarray(CUDAInterfaceBridge(raw_views["cell_status"]))
     coordinate_id = jnp.asarray(CUDAInterfaceBridge(raw_views["coordinate_id"]))
     
     # 🛡️ [CRITICAL LIFETIME ASYNCHRONOUS CONTEXT FENCE]
-    # 비동기 하드 펜스: GC에 의한 포인터 조기 파손 원천 차단 [1.5]
+    # 비동기 하드 펜스: GC에 의한 포인터 조기 파손 원천 차단
+    # Asynchronous hard fence: Fundamentally prevent premature pointer destruction by GC
     for field in [spatial_u, param_w, spatial_v, adaptive_gain, cell_status, coordinate_id]:
         field.block_until_ready()
         
