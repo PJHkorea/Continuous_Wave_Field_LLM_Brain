@@ -12,7 +12,7 @@
 
 *   **[Fluidic_Network_Grid (FNG) V3]**: NCCL All-Reduce 동기화 배리어를 대수적으로 우회하고, 가혹한 패킷 유실 및 무선 노이즈 환경에서 시변 지터를 소수점 8자리 정밀도로 정류하는 가속기-통신 하드웨어 네이티브 제어 평면 레이어입니다.
 *   **[Forward_Only_Autograd_Free_PINN]**: GPU 워프(Warp) 수준의 레지스터 셔플 기반 무분기 공간 차분 기술을 적용하여, FNG V3 스트림의 3차 모멘트 왜도(\(m_3/m_2\)) 대수적 약분 소거 및 1-Cycle FMA 가중치 자율 평형을 완결하는 수리 물리 연산 코어 엔진입니다.
-*   **[Continuous_Wave_Field_LLM_Brain]**: DLPack 통합 메모리 표준 규격 인터페이스를 기반으로 PyTorch 가중치 버퍼와 JAX/XLA 가속 장치 간의 0ns 무복사 데이터 교환을 관류 인터록하여 후단 Llama 어텐션 코어로 청정 다양체 텐서를 전송하는 하이브리드 가이드 레이어입니다.
+*   **[Continuous_Wave_Field_LLM_Brain v5.0]**: DLPack 통합 메모리 표준 규격 인터페이스를 기반으로 PyTorch 가중치 버퍼와 JAX/XLA 가속 장치 간의 0ns 무복사 데이터 교환을 관류 인터록하여 후단 Llama 어텐션 코어로 청정 다양체 텐서를 전송하는 하이브리드 가이드 레이어입니다.
 
 ---
 
