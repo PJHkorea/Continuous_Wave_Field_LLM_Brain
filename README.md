@@ -104,6 +104,7 @@ class CustomTransformerBlock(nn.Module):
         
         # 상하부 데이터로더 및 인프라 파이프라인의 99% 기존 코드는 단 한 줄도 손대지 않고 그대로 유지됩니다.
         return self.mlp(attn_out) + x
+
 ```
 
 
